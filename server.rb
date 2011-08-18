@@ -1,29 +1,64 @@
 require "socket"
 
+def log(*args)
+  puts args
+end
 
 class ChatServer
-  attr_accessor :port 
-
-  def initilize(port)
-    self.port = port
+  attr_accessor :port
+  
+  def initialize(some_port)
+    self.port = some_port
     @sockets = {}
-
   end 
 
-  def run 
+  def run
+    log "Starting Chatte server..."
     Socket.tcp_server_loop(self.port) { |sock, client_addrinfo|
+      log "Received connection. Starting one thread..."
       Thread.new do
         begin
-          puts "Received connection"
-          puts client_addrinfo
-          @sockets[rand(10000)] = sock
-          IO.copy_stream(sock, sock)          
+          nick = ""
+          log "Thread started."
+          nick = read_nickname(sock)
+          log "Storing socket for #{nick}..."
+          @sockets[nick] = sock
+          main_loop(sock, nick)
+        rescue => e
+          log "Exception raised: #{e}"
         ensure
+          log "Closing socket."
+          @sockets.delete(@sockets.key(sock))
           sock.close
+          log "Socket closed."
         end
       end 
     }
-  end 
+  end
+  
+  private
+  
+  def read_nickname(socket)
+    socket.puts "Hello client. Please write your nickname."
+    nick = socket.readline.chomp
+    if nick =~ /\A[a-z0-9\._+-]+\z/
+      socket.puts "Hello #{nick}. Welcome to the chat."
+    else
+      socket.puts "Invalid nickname. Please try again. Bye."
+      raise Exception.new("Invalid nickname #{nick}")
+    end
+    log "Got the nickname of the new connection. It's '#{nick}'"
+    nick
+  end
+  
+  def main_loop(socket, nickname)
+    log "main loop for '#{nickname}'"
+    while not socket.eof?
+      line = socket.readline.chomp
+      log  "#{nickname} said: #{line}"
+      socket.puts "You said: #{line}"
+    end
+  end
 end
 
 
