@@ -55,8 +55,10 @@ class ChatServer
     log "main loop for '#{nickname}'"
     while not socket.eof?
       line = socket.readline.chomp
-      log  "#{nickname} said: #{line}"
-      socket.puts "You said: #{line}"
+      log "#{nickname} said: #{line}"
+      @sockets.each do |other_nickname, other_socket|
+        other_socket.puts "#{nickname} said: #{line}"
+      end
     end
   end
 end
