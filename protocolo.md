@@ -12,7 +12,7 @@ El servidor responde con:
 
 El 0 es una petición al cliente para que envíe su apodo. El cliente responde con:
 
-    1 Achury
+    Achury
 
 El servidor responde con una de tres opciones:
 
