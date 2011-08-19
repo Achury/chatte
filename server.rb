@@ -39,15 +39,19 @@ class ChatServer
   private
   
   def read_nickname(socket)
-    socket.puts "Hello client. Please write your nickname."
+    socket.puts "0 Hello, nickname please."
     nick = socket.readline.chomp
-    if nick =~ /\A[a-z0-9\._+-]+\z/
-      socket.puts "Hello #{nick}. Welcome to the chat."
+    if nick =~ /\A[a-z0-9\._+-]+\z/i
+      socket.puts "200 Welcome to the chatte." 
     else
-      socket.puts "Invalid nickname. Please try again. Bye."
+      socket.puts "201 Invalid nickname. Please try again. Bye."
       raise Exception.new("Invalid nickname #{nick}")
     end
     log "Got the nickname of the new connection. It's '#{nick}'"
+    if @sockets.include?(nick)
+      socket.puts "202 Nickname already in use. Please try with another one. Bye." 
+      raise Exception.new("Nickname #{nick} already taken")
+    end
     nick
   end
   
@@ -55,9 +59,32 @@ class ChatServer
     log "main loop for '#{nickname}'"
     while not socket.eof?
       line = socket.readline.chomp
-      log "#{nickname} said: #{line}"
-      @sockets.each do |other_nickname, other_socket|
-        other_socket.puts "#{nickname} said: #{line}"
+      unless line =~ /(100|101|102)\ (.*)/
+        socket.puts "666 Invalid command. Ignoring."
+        next 
+      end
+
+      if $1 == "100"
+        message = $2
+        @sockets.each do |other_nickname, other_socket|
+          other_socket.puts "100 #{nickname} #{message}"
+        end
+        socket.puts "101 Message sent."
+      elsif $1 == "101"
+        # The client received the message. Great!
+      elsif $1 == "102"
+        unless line =~ /102\ ([^\s]+)\s(.+)/
+          socket.puts "666 Invalid command. Ignoring."
+          next
+        end
+        destinatary = $1
+        message = $2
+        unless @sockets.include?(destinatary)
+          socket.puts "203 Invalid destinatary. Verify the nickname."
+          next
+        end
+        @sockets[destinatary].puts "102 #{destinatary} #{message}"
+        socket.puts "101 Message sent."
       end
     end
   end
