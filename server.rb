@@ -28,6 +28,9 @@ class ChatServer
           log "Exception raised: #{e}"
         ensure
           log "Closing socket."
+          @sockets.each do |all_nick, all_socket|
+            all_socket.puts "151 #{nick} just left the chat"
+          end
           @sockets.delete(@sockets.key(sock))
           sock.close
           log "Socket closed."
@@ -36,7 +39,7 @@ class ChatServer
     }
   end
   
-  private
+ # private
   
   def read_nickname(socket)
     socket.puts "0 Hello, nickname please."
@@ -48,6 +51,9 @@ class ChatServer
       raise Exception.new("Invalid nickname #{nick}")
     end
     log "Got the nickname of the new connection. It's '#{nick}'"
+    @sockets.each do |all_nick, all_socket|
+      all_socket.puts "150 #{nick} just joined to the chat"
+    end
     if @sockets.include?(nick)
       socket.puts "202 Nickname already in use. Please try with another one. Bye." 
       raise Exception.new("Nickname #{nick} already taken")
@@ -83,7 +89,7 @@ class ChatServer
           socket.puts "203 Invalid destinatary. Verify the nickname."
           next
         end
-        @sockets[destinatary].puts "102 #{destinatary} #{message}"
+        @sockets[destinatary].puts "102 #{nickname} #{message}"
         socket.puts "101 Message sent."
       end
     end
