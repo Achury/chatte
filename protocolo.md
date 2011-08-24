@@ -33,6 +33,14 @@ El servidor responde con una de tres opciones:
         202 Nickname already in use. Please try with another one. Bye.
 
     En este caso el servidor cierra la conexión.
+    
+Cuando un usuario entra al chat el servidor notifica a los demas usuarios activos 
+
+    150 nickname just join to the chat
+    
+cuando un usuario sale del chat el servidor notifica a los demas usuarios activos 
+
+    151 nickname just left the chat
 
 
 Envío de mensajes
