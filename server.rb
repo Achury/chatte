@@ -30,7 +30,7 @@ class ChatServer
         ensure
           log "Closing socket."
           @sockets.delete(@sockets.key(sock))
-          notify_user_left(nick)
+          notify_user_left(nick) if nick && nick.size > 0
           sock.close
           log "Socket closed."
         end
@@ -44,16 +44,17 @@ class ChatServer
     socket.puts "0 Hello, nickname please."
     nick = socket.readline.chomp
     if nick =~ /\A[a-z0-9\._+-]+\z/i
-      socket.puts "200 Welcome to the chatte." 
+      if @sockets.include?(nick)
+        socket.puts "202 Nickname already in use. Please try with another one. Bye." 
+        raise Exception.new("Nickname #{nick} already taken")
+      else      
+        socket.puts "200 Welcome to the chatte." 
+      end
     else
       socket.puts "201 Invalid nickname. Please try again. Bye."
       raise Exception.new("Invalid nickname #{nick}")
     end
     log "Got the nickname of the new connection. It's '#{nick}'"
-    if @sockets.include?(nick)
-      socket.puts "202 Nickname already in use. Please try with another one. Bye." 
-      raise Exception.new("Nickname #{nick} already taken")
-    end
     nick
   end
   
