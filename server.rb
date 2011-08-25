@@ -23,15 +23,14 @@ class ChatServer
           nick = read_nickname(sock)
           log "Storing socket for #{nick}..."
           @sockets[nick] = sock
+          notify_user_joined(nick)
           main_loop(sock, nick)
         rescue => e
           log "Exception raised: #{e}"
         ensure
           log "Closing socket."
-          @sockets.each do |all_nick, all_socket|
-            all_socket.puts "151 #{nick} just left the chat"
-          end
           @sockets.delete(@sockets.key(sock))
+          notify_user_left(nick)
           sock.close
           log "Socket closed."
         end
@@ -51,9 +50,6 @@ class ChatServer
       raise Exception.new("Invalid nickname #{nick}")
     end
     log "Got the nickname of the new connection. It's '#{nick}'"
-    @sockets.each do |all_nick, all_socket|
-      all_socket.puts "150 #{nick} just joined to the chat"
-    end
     if @sockets.include?(nick)
       socket.puts "202 Nickname already in use. Please try with another one. Bye." 
       raise Exception.new("Nickname #{nick} already taken")
@@ -61,6 +57,18 @@ class ChatServer
     nick
   end
   
+  def notify_user_joined(nickname)
+    @sockets.each do |other_nick, socket|
+      socket.puts "150 #{nickname} just joined the chatte"
+    end
+  end
+
+  def notify_user_left(nickname)
+    @sockets.each do |other_nick, socket|
+      socket.puts "151 #{nickname} just left the chatte"
+    end
+  end
+
   def main_loop(socket, nickname)
     log "main loop for '#{nickname}'"
     while not socket.eof?
