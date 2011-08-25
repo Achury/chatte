@@ -1,13 +1,26 @@
 #!/usr/bin/env ruby
 require 'timeout'
 require 'socket'
+require 'readline'
 
 def log(*args)
   puts args
 end
 
+module Colors
+  def colorize(text, color_code)
+    "\033[#{color_code}m#{text}\033[0m"
+  end
+
+  def red(text); colorize(text, "31"); end
+  def green(text); colorize(text, "32"); end  
+  def blue(text); colorize(text, "34"); end
+  def gray(text); colorize(text, "37"); end
+end
+
 
 class ChatClient
+  include Colors
 
   attr_accessor :ip, :port, :nickname
 
@@ -18,9 +31,8 @@ class ChatClient
   end
   
   def run
-    log "Opening socket..."
+    show_server_notice("Connecting...")
     @socket = TCPSocket.new(ip, port)
-    log "...opened."
     begin
       line = ""
       timeout(5) do
@@ -30,7 +42,7 @@ class ChatClient
       @socket.puts nickname
       line = @socket.gets.chomp
       if line =~ /(201|202)\s(.+)/
-        puts $2
+        puts show_server_notice($2)
         exit
       end
       # Connected, let's start the threads
@@ -52,7 +64,7 @@ class ChatClient
   
   def read_from_server_thread
     begin
-      loop do
+      while not @socket.eof?
         line = @socket.gets.chomp
         if line =~ /100\s([^\s]+)\s(.+)/
           show_public_message($1, $2)
@@ -69,11 +81,12 @@ class ChatClient
   
   def write_to_server_thread
     begin
-      loop do
+      while not STDIN.eof?
         line = STDIN.gets.chomp
         if line =~ /\/whisper/
-          if line =~ /\/whisper\s([^s]+)\s(.+)/ # private message
+          if line =~ /\/whisper\s([^\s]+)\s(.+)/ # private message
             send_private_message($1, $2)
+            STDOUT.puts green("You whispered to #{$1}: ") + $2
           else
             puts "Usage: /whisper <nickname> <message>"
           end
@@ -95,15 +108,15 @@ class ChatClient
   end
   
   def show_public_message(from, message)
-   STDOUT.puts "#{from} says: '#{message}'"    
+   STDOUT.puts blue("#{from} says: ") + message
   end
   
   def show_private_message(from, message)
-    STDOUT.puts "#{from} whispers: '#{message}'"
+    STDOUT.puts red("#{from} whispers: ") + message
   end
   
   def show_server_notice(notice)
-    STDOUT.puts notice
+    STDOUT.puts gray(notice)
   end
   
   def invalid_response!
