@@ -13,7 +13,7 @@ class ChatServer
   end 
 
   def run
-    log "Starting Chatte server..."
+    log "Starting Chatte server. Listening for connections on port #{port}..."
     Socket.tcp_server_loop(self.port) { |sock, client_addrinfo|
       log "Received connection. Starting one thread..."
       Thread.new do
@@ -105,6 +105,11 @@ class ChatServer
   end
 end
 
+if ARGV.size < 1
+  puts "Usage: ruby #{__FILE__} [port]"
+else
+  server = ChatServer.new(ARGV[0].to_i)
+  server.run
+end
 
-server = ChatServer.new(1234)
-server.run
+
