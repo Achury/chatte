@@ -83,7 +83,9 @@ class ChatClient
     begin
       while not STDIN.eof?
         line = STDIN.gets.chomp
-        if line =~ /\/whisper/
+        if line =~ /\/(exit|quit)/i
+          quit_gracefully
+        elsif line =~ /\/whisper/i
           if line =~ /\/whisper\s([^\s]+)\s(.+)/ # private message
             send_private_message($1, $2)
             STDOUT.puts green("You whispered to #{$1}: ") + $2
@@ -119,9 +121,15 @@ class ChatClient
     STDOUT.puts gray(notice)
   end
   
+  def quit_gracefully
+    # kill existing threads
+    STDOUT.puts gray("Bye bye!")    
+    Thread.list.each { |t| t.kill unless t == Thread.main }
+  end
+  
   def invalid_response!
     log "Server is not responding appropriately. Are you sure this is a chatte server?"
-    throw Exception.new("Invalid server response")
+    quit_gracefully
   end
 end
 
