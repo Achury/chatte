@@ -36,7 +36,7 @@ El servidor responde con una de tres opciones:
     
 Cuando un usuario entra al chat el servidor notifica a los demas usuarios activos 
 
-    150 nickname just join to the chat
+    150 nickname just joined to the chat
     
 cuando un usuario sale del chat el servidor notifica a los demas usuarios activos 
 
