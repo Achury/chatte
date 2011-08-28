@@ -7,6 +7,11 @@ def log(*args)
   puts args
 end
 
+trap("SIGINT") do
+  log("\nTerminating client...")
+  Thread.list.each { |t| t.kill }
+end
+
 module Colors
   def colorize(text, color_code)
     "\033[#{color_code}m#{text}\033[0m"

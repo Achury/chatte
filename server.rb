@@ -4,6 +4,11 @@ def log(*args)
   puts args
 end
 
+trap("SIGINT") do
+  log("\nTerminating server...")
+  Thread.list.each { |t| t.kill }
+end
+
 class ChatServer
   attr_accessor :port
   
