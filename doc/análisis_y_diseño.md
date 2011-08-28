@@ -48,11 +48,11 @@ Tanto en el cliente como en el servidor se hace un manejo apropiado de excepcion
 
 Nuestra aplicación realmente no implementa un modelo estricto de seguridad. La única revisión que se hace es que un cliente no intente identificarse como otro que ya está en la sala para suplantarlo.
 
-Es cierto que los mensajes privados podrían llegar a interceptarse por una máquina que esté en la misma red que la máquina del destinatario puesto que se trata de paquetes TCP (y existen técnicas conocidas para interceptar paquetes TCP dentro del mismo segmento de red). Es posible resolver este problema implementando un esquema de encriptación al estilo SSL, por ejemplo, pero esto complica las cosas de manera considerable y consideramos que se sale del alcance de esta práctica.
+Es cierto que los mensajes privados podrían llegar a interceptarse por una máquina que esté en la misma red que la máquina del destinatario puesto que se trata de paquetes TCP (y existen técnicas conocidas para interceptar paquetes TCP dentro del mismo segmento de red). Es posible resolver este problema implementando un esquema de encriptación al estilo SSL, por ejemplo, pero esto complica las cosas de manera considerable y pensamos que se sale del alcance de esta práctica.
 
 ### Niveles de transparencia
 
-Al usarse un protocolo de chat, se agrega un nivel de transparencia pues se puede cambiar la implementación del cliente por cualquier otra implementación que implemente el protocolo. Para los usuarios conectados es indiferente que cliente están usando los otros usuarios. Si en el futuro se implementa un cliente con una interfaz gráfica, podrán comunicarse ambos clientes transparentemente a través del servidor.
+Al usarse un protocolo de chat, se agrega un nivel de transparencia pues se puede cambiar el cliente por cualquier otra aplicación que implemente el protocolo. Para los usuarios conectados es indiferente qué cliente están usando los otros usuarios. Si en el futuro se implementa un cliente con una interfaz gráfica, podrán comunicarse ambos clientes transparentemente a través del servidor.
 
 ### Multiusuario
 
@@ -70,6 +70,6 @@ Nuestra aplicación debe satisfacer los siguientes criterios de calidad:
 
 ## Consideraciones de escalabilidad y extensibilidad
 
-No podemos afirmar que la manera como está implementado el servidor es muy escalable. El servidor lanza un nuevo hilo cada vez que recibe una conexión y este esquema tarde o temprano alcanzará los límites físicos de la máquina donde corre el servidor. Si quisiéramos implementar un servidor más escalable tendríamos que recurrir a otros métodos como por ejemplo _pool_ de conexiones ó un mecanismo que permita que varios servidores compartan la misma sala de chat (esto permitiría usar tener varias máquinas diferentes compartiendo la misma sala de chat detrás de un balanceador de carga).
+No podemos afirmar que la manera como está implementado el servidor es muy escalable. El servidor lanza un nuevo hilo cada vez que recibe una conexión y este esquema tarde o temprano alcanzará los límites físicos de la máquina donde corre el servidor. Si quisiéramos implementar un servidor más escalable tendríamos que recurrir a otros métodos como por ejemplo _pool_ de conexiones ó un mecanismo que permita que varios servidores compartan la misma sala de chat (esto permitiría tener varias máquinas diferentes compartiendo la misma sala de chat detrás de un balanceador de carga).
 
 En términos de extensibilidad, si quisiéramos agregar una nueva funcionalidad (por ejemplo varias salas de chat al mismo tiempo) las instrucciones a seguir son modificar el protocolo y después implementar los cambios en el cliente y el servidor.
