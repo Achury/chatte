@@ -27,7 +27,7 @@ El servidor recibe un parámetro desde la línea de comando correspondiente al p
     $ ruby server.rb 1234
     Starting Chatte server. Listening for connections on port 1234...
 
-En este momento el servidor se encuentra aceptando conexiones entrantes y se puede continuar ejecutando el cliente.
+En este momento el servidor se encuentra aceptando conexiones entrantes y se puede continuar a ejecutar el cliente.
 
 ## Ejecución del cliente
 
