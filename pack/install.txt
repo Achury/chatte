@@ -1,0 +1,21 @@
+# Instalación
+
+## Instalación de Ruby
+
+La aplicación está escrita en el lenguaje de programación Ruby. Esto implica que se necesita instalar la máquina virtual de Ruby para poderla ejecutar.
+
+La manera más fácil de instalar Ruby es usando RVM (Ruby Version Manager). Instrucciones detalladas sobre como instalar RVM se encuentran en http://beginrescueend.com/rvm/install/.
+
+Una vez instalado RVM, debe instalarse la versión más reciente de Ruby 1.9.2. Esto puede hacerse ejecutando el comando:
+
+    $ rvm install ruby-1.9.2-head
+    
+Después puede comprobarse que se instaló correctamente Ruby 1.9.2, corriendo el comando:
+
+    $ ruby -v
+    
+La salida debería ser algo como esto (puede variar según el sistema operativo):
+
+    ruby 1.9.2p180 (2011-02-18 revision 30909) [x86_64-darwin10.7.0]
+
+¡Listo! Ya se puede ejecutar el servidor.
